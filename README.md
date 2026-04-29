@@ -1,6 +1,12 @@
 # reproducible-containers/buildkit-cache-dance
 
-Hardened GitHub Action by [Chainguard](https://www.chainguard.dev).
+Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at [https://github.com/reproducible-containers/buildkit-cache-dance](https://github.com/reproducible-containers/buildkit-cache-dance).
+
+## Versions
+
+| Version | Tag | Upstream commit |
+|---------|-----|-----------------|
+| v3.3.2 | [`v3.3.2`](https://github.com/chainguard-actions/buildkit-cache-dance/tree/v3.3.2) | — |
 
 ## Privacy
 
