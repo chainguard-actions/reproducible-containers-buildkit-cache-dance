@@ -1,5 +1,6 @@
 {
   "owner": "reproducible-containers",
   "name": "buildkit-cache-dance",
-  "visibility": ""
+  "visibility": "internal",
+  "description": "Save `RUN --mount=type=cache` caches on GitHub Actions ( Forked from https://github.com/overmindtech/buildkit-cache-dance )"
 }
