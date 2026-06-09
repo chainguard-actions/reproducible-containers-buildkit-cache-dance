@@ -9,6 +9,7 @@ Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at
 | Version | Tag | Upstream commit |
 |---------|-----|-----------------|
 | v3.3.2 | [`v3.3.2`](https://github.com/chainguard-actions/reproducible-containers-buildkit-cache-dance/tree/v3.3.2) | — |
+| v3.4.0 | [`v3.4.0`](https://github.com/chainguard-actions/reproducible-containers-buildkit-cache-dance/tree/v3.4.0) | [`5422eac`](https://github.com/reproducible-containers/buildkit-cache-dance/commit/5422eac04292c961a382e0f584ea0f03ad9da723) |
 
 ## Privacy
 
