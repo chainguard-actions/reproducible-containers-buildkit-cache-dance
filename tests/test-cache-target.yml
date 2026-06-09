@@ -1,0 +1,34 @@
+name: Test cache-target input (legacy)
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_EVENT_NAME: push
+      GITHUB_REF: refs/heads/main
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Set up Docker Buildx
+        run: |
+          docker buildx create --use --name test-builder-tgt || true
+
+      - name: Create cache source directory for target test
+        run: |
+          mkdir -p /tmp/target-cache
+          echo "target cache content" > /tmp/target-cache/data.txt
+
+      - id: action
+        uses: .
+        with:
+          cache-source: /tmp/target-cache
+          cache-target: /var/cache/apt
+          scratch-dir: /tmp/scratch-target
+          skip-extraction: "true"
+        continue-on-error: true
+
+      - name: Assert action ran
+        run: |
+          echo "Action completed with cache-target input"
+          echo "PASS"

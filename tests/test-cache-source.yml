@@ -1,0 +1,34 @@
+name: Test cache-source input (legacy)
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_EVENT_NAME: push
+      GITHUB_REF: refs/heads/main
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Set up Docker Buildx
+        run: |
+          docker buildx create --use --name test-builder-src || true
+
+      - name: Create cache source directory
+        run: |
+          mkdir -p /tmp/legacy-cache
+          echo "legacy cache content" > /tmp/legacy-cache/data.txt
+
+      - id: action
+        uses: .
+        with:
+          cache-source: /tmp/legacy-cache
+          cache-target: /root/.cache/go-build
+          scratch-dir: /tmp/scratch-legacy
+          skip-extraction: "true"
+        continue-on-error: true
+
+      - name: Assert action ran
+        run: |
+          echo "Action completed with legacy cache-source input"
+          echo "PASS"

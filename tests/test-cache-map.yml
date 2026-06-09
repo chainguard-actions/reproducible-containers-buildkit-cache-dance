@@ -10,14 +10,22 @@ jobs:
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
-      - name: Create cache directory
-        run: |
-          mkdir -p /tmp/test-cache
-          echo "cached-data" > /tmp/test-cache/data.txt
-
       - name: Set up Docker Buildx
         run: |
           docker buildx create --use --name test-builder || true
+
+      - name: Create cache directory
+        run: |
+          mkdir -p /tmp/test-cache
+          echo "test cache content" > /tmp/test-cache/test.txt
+
+      - name: Create a simple Dockerfile
+        run: |
+          cat > /tmp/Dockerfile <<'EOF'
+          FROM busybox:latest
+          RUN --mount=type=cache,target=/root/.cache/test \
+              echo "building with cache"
+          EOF
 
       - id: action
         uses: .
@@ -26,12 +34,11 @@ jobs:
             {
               "/tmp/test-cache": "/root/.cache/test"
             }
-          scratch-dir: /tmp/scratch-cache-map
+          scratch-dir: /tmp/scratch
           skip-extraction: "true"
-          save-always: "false"
         continue-on-error: true
 
       - name: Assert action ran
         run: |
-          echo "Action completed (continue-on-error allows partial Docker env)"
+          echo "Action completed (may have warnings about missing builder)"
           echo "PASS"
