@@ -1,6 +1,6 @@
 # reproducible-containers/buildkit-cache-dance
 
-Save `RUN --mount=type=cache` caches on GitHub Actions ( Forked from https://github.com/overmindtech/buildkit-cache-dance )
+Injects the cached data into the docker build(x|kit) process
 
 Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at [https://github.com/reproducible-containers/buildkit-cache-dance](https://github.com/reproducible-containers/buildkit-cache-dance).
 
