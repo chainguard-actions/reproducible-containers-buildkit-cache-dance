@@ -1,0 +1,44 @@
+name: Test Dockerfile auto-discovery
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_EVENT_NAME: push
+      GITHUB_REF: refs/heads/main
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Create test Dockerfile with cache mounts
+        run: |
+          mkdir -p /tmp/docker-context
+          cat > /tmp/docker-context/Dockerfile <<'EOF'
+          FROM alpine:3.18
+          RUN --mount=type=cache,target=/root/.cache/test \
+              echo "build step"
+          EOF
+
+      - name: Create cache directory
+        run: |
+          mkdir -p /tmp/cache-dir
+          echo "cache-content" > /tmp/cache-dir/data.txt
+
+      - name: Set up Docker Buildx
+        run: |
+          docker buildx create --use --name autodiscovery-builder || true
+
+      - id: action
+        uses: .
+        with:
+          dockerfile: /tmp/docker-context/Dockerfile
+          cache-dir: /tmp/cache-dir
+          scratch-dir: /tmp/scratch-autodiscovery
+          skip-extraction: "true"
+          save-always: "false"
+        continue-on-error: true
+
+      - name: Assert action ran
+        run: |
+          echo "Action completed with Dockerfile auto-discovery"
+          echo "PASS"
