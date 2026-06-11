@@ -1,4 +1,4 @@
-name: Test cache-map input
+name: Test legacy cache-source and cache-target inputs
 on:
   workflow_dispatch:
 jobs:
@@ -10,19 +10,17 @@ jobs:
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
-      - name: Prepare cache directory
+      - name: Prepare legacy cache source directory
         run: |
-          mkdir -p /tmp/test-cache
-          echo "cached-content" > /tmp/test-cache/test.txt
+          mkdir -p /tmp/legacy-cache
+          echo "legacy-cached-content" > /tmp/legacy-cache/data.txt
 
       - id: action
         uses: .
         with:
-          cache-map: |
-            {
-              "/tmp/test-cache": "/root/.cache/test"
-            }
-          scratch-dir: /tmp/scratch-cache-map
+          cache-source: /tmp/legacy-cache
+          cache-target: /root/.cache/go-build
+          scratch-dir: /tmp/scratch-legacy
           skip-extraction: "true"
         continue-on-error: true
 

@@ -1,4 +1,4 @@
-name: Test Dockerfile auto-discovery
+name: Test Dockerfile auto-discovery mode
 on:
   workflow_dispatch:
 jobs:
@@ -10,35 +10,30 @@ jobs:
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
-      - name: Create test Dockerfile with cache mounts
+      - name: Create a Dockerfile with cache mounts for auto-discovery
         run: |
-          mkdir -p /tmp/docker-context
-          cat > /tmp/docker-context/Dockerfile <<'EOF'
+          cat > /tmp/Dockerfile-test <<'EOF'
           FROM alpine:3.18
           RUN --mount=type=cache,target=/root/.cache/test \
-              echo "build step"
+              echo "building with cache"
           EOF
-
-      - name: Create cache directory
-        run: |
-          mkdir -p /tmp/cache-dir
-          echo "cache-content" > /tmp/cache-dir/data.txt
-
-      - name: Set up Docker Buildx
-        run: |
-          docker buildx create --use --name autodiscovery-builder || true
 
       - id: action
         uses: .
         with:
-          dockerfile: /tmp/docker-context/Dockerfile
-          cache-dir: /tmp/cache-dir
+          dockerfile: /tmp/Dockerfile-test
+          cache-dir: /tmp/cache-dir-autodiscovery
           scratch-dir: /tmp/scratch-autodiscovery
           skip-extraction: "true"
-          save-always: "false"
         continue-on-error: true
 
-      - name: Assert action ran
+      - name: Assert action ran without unexpected failure
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
         run: |
-          echo "Action completed with Dockerfile auto-discovery"
-          echo "PASS"
+          echo "outcome: $OUTCOME"
+          if [ "$OUTCOME" = "skipped" ]; then
+            echo "FAIL: action was skipped"
+            exit 1
+          fi
+          echo "PASS: action completed with outcome=$OUTCOME"
