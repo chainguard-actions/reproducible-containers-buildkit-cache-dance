@@ -1,0 +1,38 @@
+name: Test Dockerfile auto-discovery mode
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@b5ca514318bd6ebac0fb2aedd5d36ec1b5c232a2 # v3.10.0
+
+      - name: Create a Dockerfile with cache mounts for auto-discovery
+        run: |
+          cat > /tmp/test-Dockerfile <<'EOF'
+          FROM alpine:3.18
+          RUN --mount=type=cache,target=/root/.cache/test \
+              echo "building with cache"
+          EOF
+
+      - name: Create cache directory
+        run: |
+          mkdir -p /tmp/cache-dir
+          echo "cache content" > /tmp/cache-dir/data.txt
+
+      - name: Run action with Dockerfile auto-discovery
+        id: action
+        uses: .
+        with:
+          dockerfile: /tmp/test-Dockerfile
+          cache-dir: /tmp/cache-dir
+          skip-extraction: "true"
+          scratch-dir: /tmp/scratch-autodiscovery
+
+      - name: Verify action completed
+        run: |
+          echo "Action completed successfully with Dockerfile auto-discovery"
+          echo "PASS"
