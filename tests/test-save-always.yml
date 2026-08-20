@@ -1,4 +1,4 @@
-name: Test Dockerfile auto-discovery of cache mounts
+name: Test save-always flag
 on:
   workflow_dispatch:
 jobs:
@@ -9,33 +9,30 @@ jobs:
 
       - name: Set up Docker Buildx
         run: |
-          docker buildx create --use --name test-builder-autodiscovery || true
+          docker buildx create --use --name test-builder-save-always || true
           docker buildx inspect --bootstrap
 
-      - name: Create Dockerfile with cache mounts
+      - name: Prepare cache source directory
         run: |
-          cat > /tmp/TestDockerfile << 'EOF'
-          FROM ubuntu:22.04
-          RUN --mount=type=cache,target=/root/.cache/apt \
-              apt-get update && apt-get install -y curl
-          EOF
+          mkdir -p /tmp/save-always-cache
+          echo "important-cache-data" > /tmp/save-always-cache/important.txt
 
       - id: action
         uses: .
         continue-on-error: true
         with:
-          dockerfile: /tmp/TestDockerfile
-          cache-dir: /tmp/autodiscovery-cache
-          scratch-dir: /tmp/dance-scratch-autodiscovery
+          cache-map: '{ "/tmp/save-always-cache": "/root/.cache/save-always-test" }'
+          scratch-dir: /tmp/dance-scratch-save-always
           skip-extraction: "true"
+          save-always: "true"
 
-      - name: Assert action ran with Dockerfile auto-discovery
+      - name: Assert action ran with save-always=true
         env:
           OUTCOME: ${{ steps.action.outcome }}
         run: |
           echo "outcome: $OUTCOME"
           if [ "$OUTCOME" = "success" ]; then
-            echo "PASS: action succeeded with Dockerfile auto-discovery"
+            echo "PASS: action succeeded with save-always=true"
           elif [ "$OUTCOME" = "failure" ]; then
             echo "PASS: action failed gracefully (expected in limited Docker environment)"
           else

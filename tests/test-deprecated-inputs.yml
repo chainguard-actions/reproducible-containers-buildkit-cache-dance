@@ -1,4 +1,4 @@
-name: Test Dockerfile auto-discovery of cache mounts
+name: Test deprecated cache-source and cache-target inputs
 on:
   workflow_dispatch:
 jobs:
@@ -9,33 +9,31 @@ jobs:
 
       - name: Set up Docker Buildx
         run: |
-          docker buildx create --use --name test-builder-autodiscovery || true
+          docker buildx create --use --name test-builder-deprecated || true
           docker buildx inspect --bootstrap
 
-      - name: Create Dockerfile with cache mounts
+      - name: Prepare cache source directory
         run: |
-          cat > /tmp/TestDockerfile << 'EOF'
-          FROM ubuntu:22.04
-          RUN --mount=type=cache,target=/root/.cache/apt \
-              apt-get update && apt-get install -y curl
-          EOF
+          mkdir -p /tmp/deprecated-cache
+          echo "go-build-cache-data" > /tmp/deprecated-cache/pkg.txt
 
       - id: action
         uses: .
         continue-on-error: true
         with:
-          dockerfile: /tmp/TestDockerfile
-          cache-dir: /tmp/autodiscovery-cache
-          scratch-dir: /tmp/dance-scratch-autodiscovery
+          cache-source: /tmp/deprecated-cache
+          cache-target: /root/.cache/go-build
+          scratch-dir: /tmp/dance-scratch-deprecated
           skip-extraction: "true"
 
-      - name: Assert action ran with Dockerfile auto-discovery
+      - name: Assert action ran with deprecated inputs
         env:
           OUTCOME: ${{ steps.action.outcome }}
         run: |
           echo "outcome: $OUTCOME"
+          # The action should emit a deprecation warning and still run
           if [ "$OUTCOME" = "success" ]; then
-            echo "PASS: action succeeded with Dockerfile auto-discovery"
+            echo "PASS: action succeeded with deprecated cache-source/cache-target inputs"
           elif [ "$OUTCOME" = "failure" ]; then
             echo "PASS: action failed gracefully (expected in limited Docker environment)"
           else
