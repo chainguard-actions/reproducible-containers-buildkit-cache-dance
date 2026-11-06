@@ -4,8 +4,13 @@
   "version": "v3.3.2",
   "commit_sha": "1b8ab18fbda5ad3646e3fcc9ed9dd41ce2f297b4",
   "url": "https://github.com/reproducible-containers/buildkit-cache-dance",
-  "policy_sha": "d636be7e43ef829af6e853da6b3c7566db9f72fe",
+  "policy_sha": "374911c4be584df24e6da57af2d990570ef0f859",
   "test_policy_sha": "843adf9e4b8f85d0c08b27b9d0b09dd094b54702",
   "test_agent_version": "2",
-  "harden_agent_version": "2"
+  "harden_agent_version": "2",
+  "dist_artifact": {
+    "gcs_uri": "gs://patch-actions-node-artifacts/dist-artifacts/reproducible-containers/buildkit-cache-dance/v3.3.2/sha256-964e4c5795fb737aa37385e36eaa816eba9945c357b61157b1a538cbca422317.tar.gz",
+    "sha256": "964e4c5795fb737aa37385e36eaa816eba9945c357b61157b1a538cbca422317",
+    "size_bytes": 224084
+  }
 }
